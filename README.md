@@ -7,7 +7,7 @@ Install the tag template and add a new *Pirsch Analytics* tag. Check the URL for
 ### Single Access Token
 The [API requires](https://docs.pirsch.io/api-sdks/api/#getting-an-access-token) a token in order to send pageviews and events to your dashboard. In order to obtain a token, go to *Settings > Developer* and click *Add Client* to create a token. Pick *Access Token* as *type*, add a description and click *Create Client* to save and see your client secret. Copy this value and paste it in the *Single Access Token* field in the tag configuration. 1 
 
-### Add Event Properties
+### Add Event Metadata
 Pirsch can process additional [event metadata](https://docs.pirsch.io/api-sdks/api/#sending-an-event). Use the table to define keys and values for additional data you want to send. Keep in mind that sending personal data is not allowed! 
 
 ### Advanced Settings
