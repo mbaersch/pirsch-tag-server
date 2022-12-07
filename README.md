@@ -16,5 +16,5 @@ This section contains additional options that allows enhanced data redaction. Yo
 #### Overriding Page Path
 If you want to collect data from several sources in different paths of the same profile, you can override the page path with a different value. This option also can be used for further data redaction or enrichment.
 
-### Change Event Names
+#### Change Event Names
 Every event name can be translated for Pirsch using an optional override field. You can for example set the new event name with a lookup table. 
