@@ -1,5 +1,11 @@
-# Pirsch Analytics (pirsch-tag-server)
-Pirsch Analytics - Custom Tag Template for Server-Side Google Tag Manager
+# Pirsch Analytics
+**Custom Tag Template for server-side Google Tag Manager**
+
+Send events from server-side GTM to Pirsch Analytics using the Pirsch Analytics API 
+
+![Template Status](https://img.shields.io/badge/Community%20Template%20Gallery%20Status-submitted-orange)
+
+---
 
 ## Usage
 Install the tag template and add a new *Pirsch Analytics* tag. Check the URL for the API endpoint in case a newer version might be available - otherwise keep the standard URL. 
