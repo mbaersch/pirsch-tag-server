@@ -59,6 +59,21 @@ ___TEMPLATE_PARAMETERS___
             "type": "NON_EMPTY"
           }
         ]
+      },
+      {
+        "type": "TEXT",
+        "name": "timeout",
+        "displayName": "Timeout (ms)",
+        "simpleValueType": true,
+        "defaultValue": 1000,
+        "valueValidators": [
+          {
+            "type": "POSITIVE_NUMBER"
+          },
+          {
+            "type": "NON_EMPTY"
+          }
+        ]
       }
     ]
   },
@@ -216,7 +231,7 @@ if (url) {
        'content-type': 'application/json' 
       }, 
       method: 'POST', 
-      timeout: 500
+      timeout: data.timeout||1000
     }, 
     JSON.stringify(pirschEvent)
   );
