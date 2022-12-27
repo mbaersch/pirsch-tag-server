@@ -2,5 +2,5 @@ homepage: "https://www.markus-baersch.de"
 documentation: "https://github.com/mbaersch/pirsch-tag-server#readme"
 versions:
   # Latest version
-  - sha: 5867a8b945cd3f2e12992d894a2041a77f153ffc
+  - sha: cbe6e87beabf45b15e70f8fb9db00be6e23aaf07
     changeNotes: Initial release.
