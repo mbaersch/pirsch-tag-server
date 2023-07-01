@@ -1,9 +1,9 @@
-# Pirsch Analytics
+# Pirsch Analytics [UNOFFICIAL]
 **Custom Tag Template for server-side Google Tag Manager**
 
 Send events from server-side GTM to Pirsch Analytics using the Pirsch Analytics API 
 
-![Template Status](https://img.shields.io/badge/Community%20Template%20Gallery%20Status-submitted-orange)
+[![Template Status](https://img.shields.io/badge/Community%20Template%20Gallery%20Status-published-green)](https://tagmanager.google.com/gallery/#/owners/mbaersch/templates/pirsch-tag-server) ![Repo Size](https://img.shields.io/github/repo-size/mbaersch/pirsch-tag-server) ![License](https://img.shields.io/github/license/mbaersch/pirsch-tag-server)
 
 ---
 
