@@ -161,6 +161,34 @@ ___TEMPLATE_PARAMETERS___
         ]
       }
     ]
+  },
+  {
+    "displayName": "Logs Settings",
+    "name": "logsGroup",
+    "groupStyle": "ZIPPY_CLOSED",
+    "type": "GROUP",
+    "subParams": [
+      {
+        "type": "RADIO",
+        "name": "logType",
+        "radioItems": [
+          {
+            "value": "no",
+            "displayValue": "Do not log"
+          },
+          {
+            "value": "debug",
+            "displayValue": "Log to console during debug and preview"
+          },
+          {
+            "value": "always",
+            "displayValue": "Always log to console"
+          }
+        ],
+        "simpleValueType": true,
+        "defaultValue": "debug"
+      }
+    ]
   }
 ]
 
@@ -168,7 +196,7 @@ ___TEMPLATE_PARAMETERS___
 ___SANDBOXED_JS_FOR_SERVER___
 
 /**
- * @description Custom server-side Google Tag Manager Tag Template 
+ * @description Custom server-side Google Tag Manager Tag Template
  * Send events to Pirsch Analytics
  * @version 1.0.1
  * @see {@link https://github.com/mbaersch|GitHub} for more info
@@ -181,6 +209,12 @@ const getRemoteAddress = require('getRemoteAddress');
 const getRequestHeader = require('getRequestHeader');
 const makeInteger = require('makeInteger');
 const JSON = require('JSON');
+const makeString = require('makeString');
+const getContainerVersion = require('getContainerVersion');
+const logToConsole = require('logToConsole');
+
+const isLoggingEnabled = determinateIsLoggingEnabled();
+const traceId = getRequestHeader('trace-id');
 
 const eventData = getAllEventData();
 let url = eventData.page_location;
@@ -191,7 +225,7 @@ if (url) {
   let serviceUrl = data.endpointUrl;
   const name = eventData.event_name || "";
   const ref = data.deleteReferrer === true ? "" : eventData.page_referrer || "";
-  
+
   let pirschEvent = {
     url: url,
     ip: eventData.ip_override || getRemoteAddress(),
@@ -201,10 +235,10 @@ if (url) {
     screen_width: makeInteger((eventData.screen_resolution || "1280x800").split('x')[0]) || 1280,
     screen_height: makeInteger((eventData.screen_resolution || "1280x800").split('x')[1]) || 800
   };
-    
+
   if (ref !== "")
     pirschEvent.referrer = ref;
-  
+
   //add event data?
   if (name !== "page_view") {
     pirschEvent.event_name = eventData.event_name;
@@ -212,32 +246,82 @@ if (url) {
     //add props
     if (data.propsTable && data.propsTable.length > 0) {
       let meta = {};
-      data.propsTable.forEach(x => { 
+      data.propsTable.forEach(x => {
         if (x.value) meta[x.key] = x.value;
       });
       pirschEvent.event_meta = meta;
-    }  
+    }
   } else
     serviceUrl += "/hit";
-  
+
+  if (isLoggingEnabled) {
+    logToConsole(
+        JSON.stringify({
+          Name: 'Pirsch',
+          Type: 'Request',
+          TraceId: traceId,
+          EventName: makeString(pirschEvent.event_name || 'page_view'),
+          RequestMethod: 'POST',
+          RequestUrl: serviceUrl,
+          RequestBody: pirschEvent,
+        })
+    );
+  }
+
   sendHttpRequest(
-    serviceUrl, (statusCode) => {
-      if (statusCode >= 200 && statusCode < 300) data.gtmOnSuccess();
-      else data.gtmOnFailure(); 
-    }, 
-    { 
-      headers: {
-       'Authorization': 'Bearer ' + data.token,
-       'content-type': 'application/json' 
-      }, 
-      method: 'POST', 
-      timeout: data.timeout||1000
-    }, 
-    JSON.stringify(pirschEvent)
+      serviceUrl, (statusCode, headers, body) => {
+        if (isLoggingEnabled) {
+          logToConsole(
+              JSON.stringify({
+                Name: 'Pirsch',
+                Type: 'Response',
+                TraceId: traceId,
+                EventName: makeString(pirschEvent.event_name || 'page_view'),
+                ResponseStatusCode: statusCode,
+                ResponseHeaders: headers,
+                ResponseBody: body,
+              })
+          );
+        }
+
+        if (statusCode >= 200 && statusCode < 300) data.gtmOnSuccess();
+        else data.gtmOnFailure();
+      },
+      {
+        headers: {
+          'Authorization': 'Bearer ' + data.token,
+          'content-type': 'application/json'
+        },
+        method: 'POST',
+        timeout: data.timeout||1000
+      },
+      JSON.stringify(pirschEvent)
   );
 
-} else 
+} else
   data.gtmOnFailure();
+
+function determinateIsLoggingEnabled() {
+  const containerVersion = getContainerVersion();
+  const isDebug = !!(
+      containerVersion &&
+      (containerVersion.debugMode || containerVersion.previewMode)
+  );
+
+  if (!data.logType) {
+    return isDebug;
+  }
+
+  if (data.logType === 'no') {
+    return false;
+  }
+
+  if (data.logType === 'debug') {
+    return isDebug;
+  }
+
+  return data.logType === 'always';
+}
 
 
 ___SERVER_PERMISSIONS___
@@ -293,6 +377,59 @@ ___SERVER_PERMISSIONS___
       },
       "param": [
         {
+          "key": "headerWhitelist",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "headerName"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "user-agent"
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "headerName"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "Accept-Language"
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "headerName"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "trace-id"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
           "key": "remoteAddressAllowed",
           "value": {
             "type": 8,
@@ -317,7 +454,7 @@ ___SERVER_PERMISSIONS___
           "key": "headerAccess",
           "value": {
             "type": 1,
-            "string": "any"
+            "string": "specific"
           }
         },
         {
@@ -333,6 +470,37 @@ ___SERVER_PERMISSIONS___
       "isEditedByUser": true
     },
     "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "logging",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "environments",
+          "value": {
+            "type": 1,
+            "string": "all"
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "read_container_data",
+        "versionId": "1"
+      },
+      "param": []
+    },
+    "isRequired": true
   }
 ]
 
@@ -345,3 +513,5 @@ scenarios: []
 ___NOTES___
 
 Created on 7.12.2022, 05:01:54
+
+

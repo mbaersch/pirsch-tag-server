@@ -2,5 +2,8 @@ homepage: "https://www.markus-baersch.de"
 documentation: "https://github.com/mbaersch/pirsch-tag-server#readme"
 versions:
   # Latest version
+  - sha: 4cf826f40c6d7ca819bd6a2955d4841354198bf7
+    changeNotes: Add Stape logs format.
+
   - sha: cbe6e87beabf45b15e70f8fb9db00be6e23aaf07
     changeNotes: Initial release.
